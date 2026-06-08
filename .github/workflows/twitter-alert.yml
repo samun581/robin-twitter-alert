@@ -1,0 +1,39 @@
+name: Twitter Photo Alert
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+jobs:
+  check-twitter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install packages
+        run: |
+          pip install requests
+
+      - name: Send test message
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: |
+          python -c "
+import requests, os
+requests.post(
+f'https://api.telegram.org/bot{os.environ[\"BOT_TOKEN\"]}/sendMessage',
+data={
+'chat_id': os.environ['CHAT_ID'],
+'text': '✅ GitHub Actions is running'
+}
+)
+"
